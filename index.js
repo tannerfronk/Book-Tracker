@@ -5,6 +5,7 @@
     let searchField = document.querySelector('#bookSearchField')
     let resultsArea = document.querySelector('#searchResults')
     let resultsNum = document.querySelector('#resultNum')
+    let loadingSpinner = document.querySelector('#loadingSpinner')
 
     // array for types of books. savedBooks and booksToRead will be used when backend is hooked up
     let books = []
@@ -55,6 +56,9 @@
         let sanitizedValue = searchValue.split(' ').join('+')
         let searchURL = 'https://openlibrary.org/search.json?q=' + sanitizedValue
         currentView = 'search'
+        resultsNum.innerHTML = ''
+        resultsArea.innerHTML = ''
+        loadingSpinner.classList.remove('visually-hidden')
 
         // hit api and store results in books array
         fetch(searchURL)
@@ -72,6 +76,7 @@
                     rating: null
                 }
             })
+        loadingSpinner.classList.add('visually-hidden')
         displayResults()
         })
     }

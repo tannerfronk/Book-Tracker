@@ -61,7 +61,11 @@
             `
                 <div class="card my-2">
                     <div class="card-body">
-                        <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</button>
+                    
+                        <div class="d-flex flex-column float-end w-25">
+                            <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</button>
+                            <button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
+                        </div>
                         <h5 class="card-title">${book.title}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>
                         <p class="card-text">First published: ${book.year ?? 'Unknown'}</p>
@@ -114,6 +118,8 @@
         }
         if(currentView === 'readList'){
             displayReadList()
+        } else if(currentView == 'search'){
+            displayResults()
         } else {
             displayCompletedList()
         }
@@ -149,7 +155,7 @@
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
-                                <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</i></button>
+                                <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">Remove from list?</i></button>
                                 ${book.read ? 
                                     `<button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>` 
                                 :

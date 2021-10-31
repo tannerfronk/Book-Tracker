@@ -40,9 +40,11 @@
         let attribute = e.target.attributes.buttonFunc
         if(attribute && attribute.value == 'readList'){
             currentView = 'readList'
+            searchField.value = ''
             displayReadList()
         } else if(attribute && attribute.value == 'completedList'){
             currentView = 'completedList'
+            searchField.value = ''
             displayCompletedList()
         }
     })

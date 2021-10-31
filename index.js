@@ -6,18 +6,44 @@
     let resultsArea = document.querySelector('#searchResults')
     let resultsNum = document.querySelector('#resultNum')
 
-    // array for searched books
+    // array for types of books. savedBooks and booksToRead will be used when backend is hooked up
     let books = []
     let savedBooks = []
     let booksToRead = []
+
+    // initiate current view and num of results
     let numFound = 0
-    let currentView = ''
+    let currentView = 'search'
 
     // allow search by click or enter
     searchBtn.addEventListener('click', search)
     searchField.addEventListener('keydown', (e) => {
         if(e.key === 'Enter'){
             search()
+        }
+    })
+
+    // event listeners for adding to reading list, completing books, and rating.
+    document.addEventListener('click', (e) => {
+        let attribute = e.target.attributes.buttonFunc
+        if(attribute && attribute.value == 'addToReadList'){
+            addToReadList(e)
+        } else if(attribute && attribute.value == 'completeBook'){
+            completeBook(e)
+        } else if(attribute && attribute.value == 'rateBook'){
+            rateBook(e)
+        }
+    })
+
+    // event listeners to keep track of view for rendering correct lists on updates
+    document.addEventListener('click', (e) => {
+        let attribute = e.target.attributes.buttonFunc
+        if(attribute && attribute.value == 'readList'){
+            currentView = 'readList'
+            displayReadList()
+        } else if(attribute && attribute.value == 'completedList'){
+            currentView = 'completedList'
+            displayCompletedList()
         }
     })
 
@@ -51,40 +77,6 @@
         displayResults()
         })
     }
-
-    // display results
-    function displayResults() {
-        resultsNum.innerHTML = `Results Found: ${numFound}` 
-        resultsArea.innerHTML = ''
-        books.forEach((book) => {
-            resultsArea.innerHTML += 
-            `
-                <div class="card my-2">
-                    <div class="card-body">
-                    
-                        <div class="d-flex flex-column float-end w-25">
-                            <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</button>
-                            <button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
-                        </div>
-                        <h5 class="card-title">${book.title}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>
-                        <p class="card-text">First published: ${book.year ?? 'Unknown'}</p>
-                    </div>
-                </div>
-            `
-        })
-    }
-
-    document.addEventListener('click', (e) => {
-        let attribute = e.target.attributes.buttonFunc
-        if(attribute && attribute.value == 'addToReadList'){
-            addToReadList(e)
-        } else if(attribute && attribute.value == 'completeBook'){
-            completeBook(e)
-        } else if(attribute && attribute.value == 'rateBook'){
-            rateBook(e)
-        }
-    })
 
     // change readlist to true or false
     function addToReadList(event) {
@@ -125,6 +117,7 @@
         }
     }
     
+    // change rating for selected book
     function rateBook(event){
         let bookID = event.target.id
         let ratingID = '[id="rate' + bookID + '"]'
@@ -134,16 +127,29 @@
         displayCompletedList()
     }
 
-    document.addEventListener('click', (e) => {
-        let attribute = e.target.attributes.buttonFunc
-        if(attribute && attribute.value == 'readList'){
-            currentView = 'readList'
-            displayReadList()
-        } else if(attribute && attribute.value == 'completedList'){
-            currentView = 'completedList'
-            displayCompletedList()
-        }
-    })
+    // start of display functions
+
+    function displayResults() {
+        resultsNum.innerHTML = `Results Found: ${numFound}` 
+        resultsArea.innerHTML = ''
+        books.forEach((book) => {
+            resultsArea.innerHTML += 
+            `
+                <div class="card my-2">
+                    <div class="card-body">
+                    
+                        <div class="d-flex flex-column float-end w-25">
+                            <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</button>
+                            <button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
+                        </div>
+                        <h5 class="card-title">${book.title}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>
+                        <p class="card-text">First published: ${book.year ?? 'Unknown'}</p>
+                    </div>
+                </div>
+            `
+        })
+    }
 
     function displayReadList(){
         resultsArea.innerHTML = ''
@@ -226,9 +232,8 @@
             }
         })
         resultsNum.innerHTML = `Books Completed: ${completedLength}` 
-    }
+    } 
 
+    // end of display functions
 
-
-    
 })(window)

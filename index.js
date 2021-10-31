@@ -139,7 +139,7 @@
                     <div class="card-body">
                     
                         <div class="d-flex flex-column float-end w-25">
-                            <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</button>
+                            <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
                             <button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
                         </div>
                         <h5 class="card-title">${book.title}</h5>
@@ -191,7 +191,7 @@
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
-                                <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Read List <i class="fas fa-check"></i>' : 'Add to Read List'}</button>
+                                <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
                                 ${book.read ? 
                                     `<button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Read <i class="fas fa-check"></i></button>`
                                 :

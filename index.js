@@ -51,15 +51,13 @@
     function search() {
         let searchValue = searchField.value
         let sanitizedValue = searchValue.split(' ').join('+')
-        let searchURL = 'http://openlibrary.org/search.json?q=' + sanitizedValue
+        let searchURL = 'https://openlibrary.org/search.json?q=' + sanitizedValue
         currentView = 'search'
-        console.log(searchURL)
 
         // hit api and store results in books array
         fetch(searchURL)
         .then(res => res.json())
         .then(data => {
-            console.log(data)
             numFound = data.numFound
             books = data.docs.map((book) => {
                 return {
@@ -72,8 +70,6 @@
                     rating: null
                 }
             })
-            
-        console.log(books)
         displayResults()
         })
     }

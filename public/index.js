@@ -8,7 +8,7 @@
     let loadingSpinner = document.querySelector('#loadingSpinner')
 
     // array for types of books
-    let getAllBooks = () => fetch('/api/getAllBooks/')
+    let getAllBooks = () => fetch('/api/getAllBooks')
     .then(res => res.json())
     .then(data => {
         books = Array.from(data)
@@ -71,7 +71,7 @@
         .then(res => res.json())
         .then(data => {
             numFound = data.numFound
-            books = data.docs.map((book) => {
+            bookResults = data.docs.map((book) => {
                 return {
                     id: book.key,
                     author: book.author_name,
@@ -82,22 +82,22 @@
                     rating: ''
                 }
             })
-            console.log(books)
+            console.log(bookResults)
             loadingSpinner.classList.add('visually-hidden')
-            displayResults()
+            displayResults(bookResults)
         })
     }
 
     // change readlist to true or false
     function addToReadList(event) {
         let bookID = event.target.id
-        let book = books.find(book => book.id === bookID)
+        let book = bookResults.find(book => book.id === bookID)
         if(!book.readList){
             book.readList = true
         } else {
             book.readList = false
         }
-        fetch('/api/readingList/', {
+        fetch('/api/readingList', {
             method: 'POST',
             body: JSON.stringify(book),
             headers: {
@@ -114,7 +114,7 @@
             } else if(currentView === 'readList'){
                 displayReadList()
             } else{
-                displayResults()
+                displayResults(bookResults)
             }
         })
         
@@ -133,7 +133,7 @@
         if(currentView === 'readList'){
             displayReadList()
         } else if(currentView == 'search'){
-            displayResults()
+            displayResults(bookResults)
         } else {
             displayCompletedList()
         }
@@ -151,10 +151,10 @@
 
     // start of display functions
 
-    function displayResults() {
+    function displayResults(bookResults) {
         resultsNum.innerHTML = `Results Found: ${numFound}` 
         resultsArea.innerHTML = ''
-        books.forEach((book) => {
+        bookResults.forEach((book) => {
             resultsArea.innerHTML += 
             `
                 <div class="card my-2">

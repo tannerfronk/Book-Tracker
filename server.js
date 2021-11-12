@@ -31,22 +31,30 @@ app.use(express.static('public'))
 // rating: null
 
 // get all books from database
-app.get('/api/getAllBooks/', async (req, res) => {
+app.get('/api/getAllBooks', async (req, res) => {
     const books = await Book.find()
     console.log(books)
     return res.send(books)
 })
 
 // add book to reading list.
-app.post('/api/readingList/', async (req, res) => {
-    // if book is in database, change readList to opposite value
+app.post('/api/readingList', async (req, res) => {
+    // if book is in database, change readList to updated value
     let doesBookExist = await Book.findOne({ id: req.body.id })
     if(doesBookExist){
-        const result = await Book.findOneAndDelete({ id: req.body.id })
-        .then(async () => {
+        if(doesBookExist.read){
+            doesBookExist.readList = req.body.readList
+            const result = await doesBookExist.save()
             let allBooks = await Book.find()
             return res.send(allBooks)
-        })
+        } else{
+            console.log(`Book: ${doesBookExist.title}, no longer needs to be tracked. Deleting...`)
+            const result = await Book.findOneAndDelete({ id: req.body.id })
+            .then(async () => {
+                let allBooks = await Book.find()
+                return res.send(allBooks)
+            })
+        }
     } else {
         // if book isn't in database, add it
         const newBook = new Book({
@@ -61,14 +69,31 @@ app.post('/api/readingList/', async (req, res) => {
         const result = newBook.save()
         .then(doc => {
             console.log(doc)
-            console.log('added book')
+            console.log(`Added ${newBook.title}`)
         })
         .then(async () => {
             let allBooks = await Book.find()
             return res.send(allBooks)
         })
     }
-    
+})
 
-    
+app.post('/api/markAsRead', async (req, res) => {
+    // if book is in database, change read to updated value
+    let doesBookExist = await Book.findOne({ id: req.body.id })
+    if(doesBookExist){
+        if(doesBookExist.read){
+            doesBookExist.readList = req.body.readList
+            const result = await doesBookExist.save()
+            let allBooks = await Book.find()
+            return res.send(allBooks)
+        } else{
+            console.log(`Book: ${doesBookExist.title}, no longer needs to be tracked. Deleting...`)
+            const result = await Book.findOneAndDelete({ id: req.body.id })
+            .then(async () => {
+                let allBooks = await Book.find()
+                return res.send(allBooks)
+            })
+        }
+    }
 })

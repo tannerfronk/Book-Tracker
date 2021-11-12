@@ -225,7 +225,7 @@
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
-                                <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">Remove from list?</i></button>
+                                <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">Remove from List</i></button>
                                 ${book.read ?
                         `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>`
                         :

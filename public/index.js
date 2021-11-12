@@ -7,10 +7,16 @@
     let resultsNum = document.querySelector('#resultNum')
     let loadingSpinner = document.querySelector('#loadingSpinner')
 
-    // array for types of books. savedBooks and booksToRead will be used when backend is hooked up
-    let books = []
-    let savedBooks = []
-    let booksToRead = []
+    // array for types of books
+    let getAllBooks = () => fetch('/api/getAllBooks/')
+    .then(res => res.json())
+    .then(data => {
+        books = Array.from(data)
+        
+        console.log(books)
+        return books
+    })
+    let books = getAllBooks()
 
     // initiate current view and num of results
     let numFound = 0
@@ -67,45 +73,58 @@
             numFound = data.numFound
             books = data.docs.map((book) => {
                 return {
-                    key: book.key,
+                    id: book.key,
                     author: book.author_name,
                     title: book.title,
                     year: book.first_publish_year,
                     readList: false,
                     read: false,
-                    rating: null
+                    rating: ''
                 }
             })
-        loadingSpinner.classList.add('visually-hidden')
-        displayResults()
+            console.log(books)
+            loadingSpinner.classList.add('visually-hidden')
+            displayResults()
         })
     }
 
     // change readlist to true or false
     function addToReadList(event) {
         let bookID = event.target.id
-        let book = books.find(book => book.key === bookID)
+        let book = books.find(book => book.id === bookID)
         if(!book.readList){
             book.readList = true
         } else {
             book.readList = false
         }
+        fetch('/api/readingList/', {
+            method: 'POST',
+            body: JSON.stringify(book),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                }
+        })
+        .then(res => res.json())
+        .then(data => {
+            // order here matters. if completedList isn't first, and you remove a book from the readlist while viewing completed,
+            // it will rerender the readlist while on the completed view
+            books = data
+            if(currentView === 'completedList'){
+                displayCompletedList()
+            } else if(currentView === 'readList'){
+                displayReadList()
+            } else{
+                displayResults()
+            }
+        })
         
-        // order here matters. if completedList isn't first, and you remove a book from the readlist while viewing completed,
-        // it will rerender the readlist while on the completed view
-        if(currentView === 'completedList'){
-            displayCompletedList()
-        } else if(currentView === 'readList'){
-            displayReadList()
-        } else{
-            displayResults()
-        }
+        
     }
 
     // change read to true or false
     function completeBook(event){
         let bookID = event.target.id
-        let book = books.find(book => book.key === bookID)
+        let book = books.find(book => book.id === bookID)
         if(!book.read){
             book.read = true
         } else {
@@ -124,7 +143,7 @@
     function rateBook(event){
         let bookID = event.target.id
         let ratingID = '[id="rate' + bookID + '"]'
-        let book = books.find(book => book.key === bookID)
+        let book = books.find(book => book.id === bookID)
         let rating = document.querySelector(ratingID).value
         book.rating = rating
         displayCompletedList()
@@ -142,8 +161,8 @@
                     <div class="card-body">
                     
                         <div class="d-flex flex-column float-end w-25">
-                            <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
-                            <button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
+                            <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
+                            <button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
                         </div>
                         <h5 class="card-title">${book.title}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>
@@ -164,11 +183,11 @@
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
-                                <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">Remove from list?</i></button>
+                                <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">Remove from list?</i></button>
                                 ${book.read ? 
-                                    `<button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>` 
+                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>` 
                                 :
-                                    `<button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end">Completed the Book?</button>`
+                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Completed the Book?</button>`
                                 }
                             </div>
                             <h5 class="card-title">${book.title}</h5>
@@ -194,21 +213,21 @@
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
-                                <button id="${book.key}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
+                                <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
                                 ${book.read ? 
-                                    `<button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Read <i class="fas fa-check"></i></button>`
+                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Read <i class="fas fa-check"></i></button>`
                                 :
-                                    `<button id="${book.key}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Completed the Book?</button>`
+                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Completed the Book?</button>`
                                 }
                                 
-                                <button id="${book.key}" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#rateModal${index}">${book.rating ? `You Rated ${book.rating} Stars` : 'Rate Book'}</button>
+                                <button id="${book.id}" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#rateModal${index}">${book.rating !== '' ? `You Rated ${book.rating} Stars` : 'Rate Book'}</button>
                                 
                                 <div class="modal fade" id="rateModal${index}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                         <div class="modal-body">
                                             <p>How would you rate ${book.title} out of 5 stars?</p>
-                                            <select id="rate${book.key}">
+                                            <select id="rate${book.id}">
                                                 <option value="1">1</option>
                                                 <option value="2">2</option>
                                                 <option value="3">3</option>
@@ -218,7 +237,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button id="${book.key}" type="button" class="btn btn-primary" buttonFunc="rateBook" data-bs-dismiss="modal">Save Rating</button>
+                                            <button id="${book.id}" type="button" class="btn btn-primary" buttonFunc="rateBook" data-bs-dismiss="modal">Save Rating</button>
                                         </div>
                                         </div>
                                     </div>

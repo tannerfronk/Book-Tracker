@@ -204,7 +204,7 @@
                     
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
-                            <button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Already Read?'}</button>
+                            <button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : "I've read this"}</button>
                         </div>
                         <h5 class="card-title">${book.title}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>
@@ -229,7 +229,7 @@
                                 ${book.read ?
                         `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>`
                         :
-                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Completed the Book?</button>`
+                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">I Completed this Book</button>`
                     }
                             </div>
                             <h5 class="card-title">${book.title}</h5>
@@ -259,7 +259,7 @@
                                 ${book.read ?
                         `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Read <i class="fas fa-check"></i></button>`
                         :
-                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Completed the Book?</button>`
+                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">I Completed this Book</button>`
                     }
                                 
                                 <button id="${book.id}" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#rateModal${index}">${book.rating !== '' ? `You Rated ${book.rating} Stars` : 'Rate Book'}</button>

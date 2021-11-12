@@ -204,7 +204,7 @@
                     
                         <div class="d-flex flex-column float-end w-25">
                             <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
-                            <button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Read Book?'}</button>
+                            <button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">${book.read ? 'Read <i class="fas fa-check"></i>' : 'Already Read?'}</button>
                         </div>
                         <h5 class="card-title">${book.title}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>

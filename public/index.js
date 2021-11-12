@@ -1,4 +1,4 @@
-(function (window){
+(function (window) {
 
     // DOM references
     let searchBtn = document.querySelector('#bookSearchBtn')
@@ -9,13 +9,13 @@
 
     // array for types of books
     let getAllBooks = () => fetch('/api/getAllBooks')
-    .then(res => res.json())
-    .then(data => {
-        books = Array.from(data)
-        
-        console.log(books)
-        return books
-    })
+        .then(res => res.json())
+        .then(data => {
+            books = Array.from(data)
+
+            console.log(books)
+            return books
+        })
     let books = getAllBooks()
 
     // initiate current view and num of results
@@ -25,7 +25,7 @@
     // allow search by click or enter
     searchBtn.addEventListener('click', search)
     searchField.addEventListener('keydown', (e) => {
-        if(e.key === 'Enter'){
+        if (e.key === 'Enter') {
             search()
         }
     })
@@ -33,11 +33,11 @@
     // event listeners for adding to reading list, completing books, and rating.
     document.addEventListener('click', (e) => {
         let attribute = e.target.attributes.buttonFunc
-        if(attribute && attribute.value == 'addToReadList'){
+        if (attribute && attribute.value == 'addToReadList') {
             addToReadList(e)
-        } else if(attribute && attribute.value == 'completeBook'){
+        } else if (attribute && attribute.value == 'completeBook') {
             completeBook(e)
-        } else if(attribute && attribute.value == 'rateBook'){
+        } else if (attribute && attribute.value == 'rateBook') {
             rateBook(e)
         }
     })
@@ -45,13 +45,15 @@
     // event listeners to keep track of view for rendering correct lists on updates
     document.addEventListener('click', (e) => {
         let attribute = e.target.attributes.buttonFunc
-        if(attribute && attribute.value == 'readList'){
+        if (attribute && attribute.value == 'readList') {
             currentView = 'readList'
             searchField.value = ''
+            bookResults = null
             displayReadList()
-        } else if(attribute && attribute.value == 'completedList'){
+        } else if (attribute && attribute.value == 'completedList') {
             currentView = 'completedList'
             searchField.value = ''
+            bookResults = null
             displayCompletedList()
         }
     })
@@ -68,79 +70,106 @@
 
         // hit api and store results in books array
         fetch(searchURL)
-        .then(res => res.json())
-        .then(data => {
-            numFound = data.numFound
-            bookResults = data.docs.map((book) => {
-                return {
-                    id: book.key,
-                    author: book.author_name,
-                    title: book.title,
-                    year: book.first_publish_year,
-                    readList: false,
-                    read: false,
-                    rating: ''
-                }
+            .then(res => res.json())
+            .then(data => {
+                numFound = data.numFound
+                bookResults = data.docs.map((book) => {
+                    return {
+                        id: book.key,
+                        author: book.author_name,
+                        title: book.title,
+                        year: book.first_publish_year,
+                        readList: false,
+                        read: false,
+                        rating: ''
+                    }
+                })
+                console.log(bookResults)
+                loadingSpinner.classList.add('visually-hidden')
+                displayResults(bookResults)
             })
-            console.log(bookResults)
-            loadingSpinner.classList.add('visually-hidden')
-            displayResults(bookResults)
-        })
     }
 
     // change readlist to true or false
     function addToReadList(event) {
         let bookID = event.target.id
-        let book = bookResults.find(book => book.id === bookID)
-        if(!book.readList){
+        let book
+
+        if (typeof bookResults === 'undefined' || bookResults === null) {
+            book = books.find(book => book.id === bookID)
+        } else {
+            book = bookResults.find(book => book.id === bookID)
+        }
+
+        if (!book.readList) {
             book.readList = true
         } else {
             book.readList = false
         }
+        
         fetch('/api/readingList', {
             method: 'POST',
             body: JSON.stringify(book),
             headers: {
                 'Content-type': 'application/json; charset=UTF-8',
-                }
-        })
-        .then(res => res.json())
-        .then(data => {
-            // order here matters. if completedList isn't first, and you remove a book from the readlist while viewing completed,
-            // it will rerender the readlist while on the completed view
-            books = data
-            if(currentView === 'completedList'){
-                displayCompletedList()
-            } else if(currentView === 'readList'){
-                displayReadList()
-            } else{
-                displayResults(bookResults)
             }
         })
-        
-        
+            .then(res => res.json())
+            .then(data => {
+                // order here matters. if completedList isn't first, and you remove a book from the readlist while viewing completed,
+                // it will rerender the readlist while on the completed view
+                books = data
+                if (currentView === 'completedList') {
+                    displayCompletedList()
+                } else if (currentView === 'readList') {
+                    displayReadList()
+                } else {
+                    displayResults(bookResults)
+                }
+            })
+
+
     }
 
     // change read to true or false
-    function completeBook(event){
+    function completeBook(event) {
         let bookID = event.target.id
         let book = books.find(book => book.id === bookID)
-        if(!book.read){
+
+        if (!book) {
+            book = bookResults.find(book => book.id === bookID)
+        }
+
+        if (!book.read) {
             book.read = true
         } else {
             book.read = false
         }
-        if(currentView === 'readList'){
-            displayReadList()
-        } else if(currentView == 'search'){
-            displayResults(bookResults)
-        } else {
-            displayCompletedList()
-        }
+
+        fetch('/api/markAsRead', {
+            method: 'POST',
+            body: JSON.stringify(book),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                // order here matters. if completedList isn't first, and you remove a book from the readlist while viewing completed,
+                // it will rerender the readlist while on the completed view
+                books = data
+                if (currentView === 'completedList') {
+                    displayCompletedList()
+                } else if (currentView === 'readList') {
+                    displayReadList()
+                } else {
+                    displayResults(bookResults)
+                }
+            })
     }
-    
+
     // change rating for selected book
-    function rateBook(event){
+    function rateBook(event) {
         let bookID = event.target.id
         let ratingID = '[id="rate' + bookID + '"]'
         let book = books.find(book => book.id === bookID)
@@ -152,11 +181,12 @@
     // start of display functions
 
     function displayResults(bookResults) {
-        resultsNum.innerHTML = `Results Found: ${numFound}` 
+        console.log(bookResults)
+        resultsNum.innerHTML = `Results Found: ${numFound}`
         resultsArea.innerHTML = ''
         bookResults.forEach((book) => {
-            resultsArea.innerHTML += 
-            `
+            resultsArea.innerHTML +=
+                `
                 <div class="card my-2">
                     <div class="card-body">
                     
@@ -173,22 +203,22 @@
         })
     }
 
-    function displayReadList(){
+    function displayReadList() {
         resultsArea.innerHTML = ''
         let readListLength = 0
         books.filter((book) => {
-            if(book.readList){
-                resultsArea.innerHTML += 
-                `
+            if (book.readList) {
+                resultsArea.innerHTML +=
+                    `
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
                                 <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">Remove from list?</i></button>
-                                ${book.read ? 
-                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>` 
-                                :
-                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Completed the Book?</button>`
-                                }
+                                ${book.read ?
+                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Read <i class="fas fa-check"></i></button>`
+                        :
+                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end">Completed the Book?</button>`
+                    }
                             </div>
                             <h5 class="card-title">${book.title}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">${book.author ?? 'Unknown'}</h6>
@@ -200,25 +230,25 @@
                 readListLength++
             }
         })
-        resultsNum.innerHTML = `Books on Reading List: ${readListLength}` 
+        resultsNum.innerHTML = `Books on Reading List: ${readListLength}`
     }
 
-    function displayCompletedList(){
+    function displayCompletedList() {
         resultsArea.innerHTML = ''
         let completedLength = 0
         books.filter((book, index) => {
-            if(book.read){
-                resultsArea.innerHTML += 
-                `
+            if (book.read) {
+                resultsArea.innerHTML +=
+                    `
                     <div class="card my-2">
                         <div class="card-body">
                             <div class="d-flex flex-column float-end w-25">
                                 <button id="${book.id}" buttonFunc="addToReadList" class="btn btn-success float-end mb-2">${book.readList ? 'On Reading List <i class="fas fa-check"></i>' : 'Add to Reading List'}</button>
-                                ${book.read ? 
-                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Read <i class="fas fa-check"></i></button>`
-                                :
-                                    `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Completed the Book?</button>`
-                                }
+                                ${book.read ?
+                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Read <i class="fas fa-check"></i></button>`
+                        :
+                        `<button id="${book.id}" buttonFunc="completeBook" class="btn btn-success float-end mb-2">Completed the Book?</button>`
+                    }
                                 
                                 <button id="${book.id}" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#rateModal${index}">${book.rating !== '' ? `You Rated ${book.rating} Stars` : 'Rate Book'}</button>
                                 
@@ -253,8 +283,8 @@
                 completedLength++
             }
         })
-        resultsNum.innerHTML = `Books Completed: ${completedLength}` 
-    } 
+        resultsNum.innerHTML = `Books Completed: ${completedLength}`
+    }
 
     // end of display functions
 

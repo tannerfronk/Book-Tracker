@@ -10,19 +10,27 @@
     <title>Book Tracking App</title>
   </head>
   <body>
-    <div class="container mt-5">
-        <h3 class="d-flex justify-content-center mb-5">Book Tracker</h3>
-        <div class="d-flex justify-content-center">
-            <div class="d-flex flex-row justify-content-around w-50 mb-5">
-                <h5><button class="btn btn-secondary" buttonFunc="readList">View Reading List</button></h5>
-                <h5><button class="btn btn-secondary" buttonFunc="completedList">View Completed Books</button></h5>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <div class="collapse navbar-collapse d-flex justify-content-center" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item me-3">
+                <h6><a class="nav-link active" aria-current="page" href="#" buttonFunc="readList">Reading List</a></h6>
+              </li>
+              <li class="nav-item ms-3">
+                <h6><a class="nav-link active" aria-current="page" href="#"  buttonFunc="completedList">Completed Books</a></h6>
+              </li>
+            </ul>
+          </div>
         </div>
+      </nav>
+
+    <div class="container mt-5">
 
         <div class="d-flex justify-content-center">
             <div class="input-group w-75">
                 <input type="text" class="form-control" id="bookSearchField" aria-describedby="bookSearch" placeholder="Search for a book using the title, ISBN, or Author!">
-                <button class="btn btn-primary" type="button" id="bookSearchBtn">Search</button>
+                <button class="btn btn-dark" type="button" id="bookSearchBtn">Search</button>
             </div>
         </div>
 

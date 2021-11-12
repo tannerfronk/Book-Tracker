@@ -124,3 +124,21 @@ app.post('/api/markAsRead', async (req, res) => {
             })
     }
 })
+
+app.put('/api/rateBook', async (req, res) => {
+    // update book rating
+    let book = await Book.findOne({ id: req.body.id})
+    let newRating = req.body.rating
+
+    book.rating = newRating
+
+    const result = book.save()
+    .then(doc => {
+        console.log(doc)
+        console.log(`Rated ${req.body.title} ${newRating} of 5 stars.`)
+    })
+    .then(async () => {
+        let allBooks = await Book.find()
+        return res.send(allBooks)
+    })
+})

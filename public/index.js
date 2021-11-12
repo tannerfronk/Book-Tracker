@@ -175,7 +175,19 @@
         let book = books.find(book => book.id === bookID)
         let rating = document.querySelector(ratingID).value
         book.rating = rating
-        displayCompletedList()
+        fetch('/api/rateBook', {
+            method: 'PUT',
+            body: JSON.stringify(book),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            books = data
+            console.log(books)
+            displayCompletedList()
+        })
     }
 
     // start of display functions
